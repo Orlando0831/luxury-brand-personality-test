@@ -1,465 +1,128 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>你的高奢品牌人格 | Luxury Brand Persona</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <style>
         :root {
-            --bg-color: #0a0a0a;
-            --text-primary: #f5f5f5;
-            --text-secondary: #a0a0a0;
-            --accent-gold: #c5a059;
-            --accent-gold-hover: #d4b06a;
-            --card-bg: #141414;
-            --border-color: #333333;
+            --bg-color: #0a0a0a; --text-primary: #f5f5f5; --text-secondary: #a0a0a0;
+            --accent-gold: #c5a059; --accent-gold-hover: #d4b06a;
+            --card-bg: #141414; --border-color: #333333;
             --font-serif: "Playfair Display", "Noto Serif SC", serif;
             --font-sans: "Helvetica Neue", Arial, sans-serif;
             --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            font-family: var(--font-sans);
-            line-height: 1.6;
-            overflow-x: hidden;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        h1, h2, h3 {
-            font-family: var(--font-serif);
-            font-weight: 400;
-            letter-spacing: 0.05em;
-        }
-
-        .gold-text {
-            color: var(--accent-gold);
-        }
-
-        .container {
-            width: 100%;
-            max-width: 800px;
-            padding: 40px 20px;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: var(--transition);
-            display: none;
-        }
-
-        .container.active {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-            animation: fadeIn 0.8s ease-out forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        header {
-            text-align: center;
-            padding: 60px 20px 40px;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 40px;
-            width: 100%;
-            max-width: 800px;
-        }
-
-        header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-
-        header p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-        }
-
-        .form-group {
-            margin-bottom: 30px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 10px;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
-
-        input[type="text"],
-        input[type="number"],
-        select {
-            width: 100%;
-            padding: 15px;
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            font-size: 1rem;
-            font-family: var(--font-sans);
-            transition: var(--transition);
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--accent-gold);
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 15px 40px;
-            background: transparent;
-            border: 1px solid var(--accent-gold);
-            color: var(--accent-gold);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            cursor: pointer;
-            transition: var(--transition);
-            text-align: center;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .btn:hover {
-            background: var(--accent-gold);
-            color: var(--bg-color);
-        }
-
-        .btn:disabled {
-            border-color: var(--border-color);
-            color: var(--text-secondary);
-            cursor: not-allowed;
-            background: transparent;
-        }
-
-        .question-card {
-            background: var(--card-bg);
-            padding: 30px;
-            margin-bottom: 30px;
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
-        }
-
-        .question-card:hover {
-            border-color: #444;
-        }
-
-        .question-text {
-            font-size: 1.2rem;
-            margin-bottom: 25px;
-            font-family: var(--font-serif);
-        }
-
-        .options-grid {
-            display: grid;
-            gap: 15px;
-        }
-
-        .option-label {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            border: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: var(--transition);
-            font-size: 0.95rem;
-        }
-
-        .option-label:hover {
-            background: #1a1a1a;
-            border-color: #555;
-        }
-
-        input[type="radio"] {
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            border: 1px solid var(--text-secondary);
-            border-radius: 50%;
-            margin-right: 15px;
-            position: relative;
-            flex-shrink: 0;
-        }
-
-        input[type="radio"]:checked {
-            border-color: var(--accent-gold);
-        }
-
-        input[type="radio"]:checked::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 10px;
-            height: 10px;
-            background: var(--accent-gold);
-            border-radius: 50%;
-        }
-
-        input[type="radio"]:checked + span {
-            color: var(--accent-gold);
-        }
-
-        .result-hero {
-            text-align: center;
-            padding: 40px 0;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 40px;
-        }
-
-        .brand-logo-text {
-            font-size: 3rem;
-            font-family: var(--font-serif);
-            color: var(--accent-gold);
-            margin-bottom: 10px;
-            letter-spacing: 0.1em;
-        }
-
-        .persona-desc {
-            font-size: 1.1rem;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto;
-            line-height: 1.8;
-            font-style: italic;
-        }
-
-        .ranking-list {
-            list-style: none;
-            margin-top: 30px;
-        }
-
-        .ranking-item {
-            padding: 15px 0;
-            border-bottom: 1px solid #222;
-            font-size: 1rem;
-        }
-
-        .ranking-item:first-child {
-            color: var(--accent-gold);
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-
-        .social-hall {
-            margin-top: 60px;
-            padding-top: 40px;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .social-hall h3 {
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-            text-align: center;
-        }
-
-        .user-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .user-card {
-            background: var(--card-bg);
-            padding: 15px;
-            border: 1px solid var(--border-color);
-            text-align: center;
-        }
-
-        .user-card .name {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .user-card .brand {
-            color: var(--accent-gold);
-            font-size: 0.9rem;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-
-        .modal-overlay.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .modal-content {
-            background: var(--card-bg);
-            padding: 40px;
-            border: 1px solid var(--accent-gold);
-            max-width: 400px;
-            text-align: center;
-        }
-
-        .modal-content p {
-            margin-bottom: 20px;
-            font-size: 1.1rem;
-        }
-
-        .modal-btn {
-            background: var(--accent-gold);
-            color: var(--bg-color);
-            border: none;
-            padding: 10px 30px;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-        
-        .progress-bar {
-            height: 2px;
-            background: #222;
-            width: 100%;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 999;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: var(--accent-gold);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: var(--bg-color); color: var(--text-primary); font-family: var(--font-sans); line-height: 1.6; overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+        h1, h2, h3 { font-family: var(--font-serif); font-weight: 400; letter-spacing: 0.05em; }
+        .gold-text { color: var(--accent-gold); }
+        .container { width: 100%; max-width: 800px; padding: 40px 20px; opacity: 0; transform: translateY(20px); transition: var(--transition); display: none; }
+        .container.active { display: block; opacity: 1; transform: translateY(0); animation: fadeIn 0.8s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        header { text-align: center; padding: 60px 20px 40px; border-bottom: 1px solid var(--border-color); margin-bottom: 40px; width: 100%; max-width: 800px; }
+        header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        header p { color: var(--text-secondary); font-size: 0.9rem; letter-spacing: 0.1em; text-transform: uppercase; }
+        .form-group { margin-bottom: 30px; }
+        label { display: block; margin-bottom: 10px; color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; }
+        input[type="text"], input[type="number"], select { width: 100%; padding: 15px; background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); font-size: 1rem; font-family: var(--font-sans); transition: var(--transition); }
+        input:focus, select:focus { outline: none; border-color: var(--accent-gold); }
+        .btn { display: inline-block; padding: 15px 40px; background: transparent; border: 1px solid var(--accent-gold); color: var(--accent-gold); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.15em; cursor: pointer; transition: var(--transition); text-align: center; width: 100%; margin-top: 20px; }
+        .btn:hover { background: var(--accent-gold); color: var(--bg-color); }
+        .btn:disabled { border-color: var(--border-color); color: var(--text-secondary); cursor: not-allowed; background: transparent; }
+        .question-card { background: var(--card-bg); padding: 30px; margin-bottom: 30px; border: 1px solid var(--border-color); transition: var(--transition); }
+        .question-card:hover { border-color: #444; }
+        .question-text { font-size: 1.2rem; margin-bottom: 25px; font-family: var(--font-serif); }
+        .options-grid { display: grid; gap: 15px; }
+        .option-label { display: flex; align-items: center; padding: 15px; border: 1px solid var(--border-color); cursor: pointer; transition: var(--transition); font-size: 0.95rem; }
+        .option-label:hover { background: #1a1a1a; border-color: #555; }
+        input[type="radio"] { appearance: none; width: 18px; height: 18px; border: 1px solid var(--text-secondary); border-radius: 50%; margin-right: 15px; position: relative; flex-shrink: 0; }
+        input[type="radio"]:checked { border-color: var(--accent-gold); }
+        input[type="radio"]:checked::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 10px; height: 10px; background: var(--accent-gold); border-radius: 50%; }
+        input[type="radio"]:checked + span { color: var(--accent-gold); }
+        .result-hero { text-align: center; padding: 40px 0; border-bottom: 1px solid var(--border-color); margin-bottom: 40px; }
+        .brand-logo-text { font-size: 3rem; font-family: var(--font-serif); color: var(--accent-gold); margin-bottom: 10px; letter-spacing: 0.1em; }
+        .persona-desc { font-size: 1.1rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto; line-height: 1.8; font-style: italic; }
+        .ranking-list { list-style: none; margin-top: 30px; }
+        .ranking-item { padding: 15px 0; border-bottom: 1px solid #222; font-size: 1rem; }
+        .ranking-item:first-child { color: var(--accent-gold); font-weight: bold; font-size: 1.2rem; }
+        .social-hall { margin-top: 60px; padding-top: 40px; border-top: 1px solid var(--border-color); }
+        .social-hall h3 { margin-bottom: 20px; font-size: 1.5rem; text-align: center; }
+        .user-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        .user-card { background: var(--card-bg); padding: 15px; border: 1px solid var(--border-color); text-align: center; }
+        .user-card .name { font-weight: bold; margin-bottom: 5px; }
+        .user-card .brand { color: var(--accent-gold); font-size: 0.9rem; }
+        .user-card .top3-brands { margin-top: 8px; font-size: 0.75rem; color: var(--text-secondary); }
+        .user-card .top3-brands span { display: inline-block; padding: 2px 6px; margin: 2px; border: 1px solid #333; border-radius: 2px; font-size: 0.7rem; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+        .modal-content { background: var(--card-bg); padding: 40px; border: 1px solid var(--accent-gold); max-width: 400px; text-align: center; }
+        .modal-content p { margin-bottom: 20px; font-size: 1.1rem; }
+        .modal-btn { background: var(--accent-gold); color: var(--bg-color); border: none; padding: 10px 30px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.1em; }
+        .hidden { display: none !important; }
+        .progress-bar { height: 2px; background: #222; width: 100%; position: fixed; top: 0; left: 0; z-index: 999; }
+        .progress-fill { height: 100%; background: var(--accent-gold); width: 0%; transition: width 0.3s ease; }
     </style>
 </head>
 <body>
-
     <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-
     <header>
         <h1>LUXURY BRAND <span class="gold-text">PERSONA</span></h1>
         <p>Discover Your High-Fashion Soul</p>
     </header>
-
     <div id="stage-info" class="container active">
         <h2 style="margin-bottom: 30px; text-align: center;">Identity Registration</h2>
-        <div class="form-group">
-            <label for="nickname">Nickname / 昵称</label>
-            <input type="text" id="nickname" placeholder="Enter your name">
-        </div>
-        <div class="form-group">
-            <label for="gender">Gender / 性别</label>
-            <select id="gender">
-                <option value="" disabled selected>Select Gender</option>
-                <option value="Female">Female / 女</option>
-                <option value="Male">Male / 男</option>
-                <option value="Non-binary">Non-binary / 非二元</option>
-                <option value="Prefer not to say">Prefer not to say / 保密</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="age">Age / 年龄</label>
-            <input type="number" id="age" placeholder="e.g., 25" min="10" max="100">
-        </div>
+        <div class="form-group"><label for="nickname">Nickname / 昵称</label><input type="text" id="nickname" placeholder="Enter your name"></div>
+        <div class="form-group"><label for="gender">Gender / 性别</label><select id="gender"><option value="" disabled selected>Select Gender</option><option value="Female">Female / 女</option><option value="Male">Male / 男</option><option value="Non-binary">Non-binary / 非二元</option><option value="Prefer not to say">Prefer not to say / 保密</option></select></div>
+        <div class="form-group"><label for="age">Age / 年龄</label><input type="number" id="age" placeholder="e.g., 25" min="10" max="100"></div>
+        <div id="validation-msg" style="color: #ff4d4f; font-size: 0.8rem; margin-bottom: 15px; min-height: 1.2em; text-align: center;"></div>
         <button class="btn" id="startBtn" disabled>Begin Test / 开始测试</button>
     </div>
-
     <div id="stage-quiz" class="container">
         <div id="questions-container"></div>
         <button class="btn" id="generateResultBtn">Generate Result / 生成结果</button>
     </div>
-
     <div id="stage-result" class="container">
         <div class="result-hero">
             <p style="color: var(--text-secondary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.2em;">Your Top Match</p>
             <div class="brand-logo-text" id="topBrandName">BRAND</div>
             <p class="persona-desc" id="topBrandDesc">Description goes here...</p>
         </div>
-
         <div style="padding: 0 20px;">
             <h3 style="margin-bottom: 20px; border-left: 2px solid var(--accent-gold); padding-left: 15px;">Affinity Ranking</h3>
             <ul class="ranking-list" id="rankingList"></ul>
         </div>
-
         <div class="social-hall" id="socialHall">
             <h3>Social Hall / 社交大厅</h3>
-            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 30px; font-size: 0.9rem;">
-                Exclusive community of completed personas.
-            </p>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 30px; font-size: 0.9rem;">Exclusive community of completed personas.</p>
             <div class="user-list" id="userList"></div>
         </div>
-        
         <button class="btn" onclick="location.reload()" style="margin-top: 40px;">Retake Test / 重新测试</button>
     </div>
-
     <div class="modal-overlay" id="alertModal">
-        <div class="modal-content">
-            <p id="modalMessage">Message</p>
-            <button class="modal-btn" onclick="closeModal()">Confirm</button>
-        </div>
+        <div class="modal-content"><p id="modalMessage">Message</p><button class="modal-btn" onclick="closeModal()">Confirm</button></div>
     </div>
-
     <script>
-        const brands = {
-            hermes: {
-                name: "Hermès",
-                desc: "你是时光的守望者，信奉'慢即是快'的极致哲学。在喧嚣世界中，你追求低调的奢华与永恒的工艺，拒绝被潮流裹挟。你拥有老钱风的从容与底气，注重内在品质而非外在Logo，生活对你而言是一场关于精致与耐心的长期主义修行。"
-            },
-            chanel: {
-                name: "Chanel",
-                desc: "你是独立精神的化身，优雅中带着不可侵犯的傲骨。你崇尚自由与简约，坚信'时尚易逝，风格永存'。你既有女性的柔美，又有打破常规的叛逆，在职场与社交场上游刃有余，永远保持着头部高昂的姿态，做自己的女王。"
-            },
-            lv: {
-                name: "Louis Vuitton",
-                desc: "你是旅行的艺术家，灵魂深处渴望着探索与冒险。你拥抱变化，热爱艺术与现代文化的碰撞，既尊重经典又敢于创新。你自信、外向，享受成为焦点的感觉，你的生活就是一场华丽的环球之旅，处处彰显着蓬勃的生命力。"
-            },
-            gucci: {
-                name: "Gucci",
-                desc: "你是浪漫的复古主义者，内心住着一个华丽而 eclectic 的灵魂。你敢于打破性别与风格的界限，用大胆的色彩和繁复的元素表达自我。你敏感、富有创造力，追求极致的感官享受，在世俗眼中或许古怪，但在你眼里这是最高级的性感。"
-            },
-            dior: {
-                name: "Dior",
-                desc: "你是梦幻的浪漫主义者，心中永远保留着一份纯真与优雅。你注重仪式感，生活对你来说需要精心雕琢。你温柔而坚定，追求完美与和谐，像一场精致的法式梦境，举手投足间散发着令人向往的贵族气息与女性魅力。"
-            },
-            prada: {
-                name: "Prada",
-                desc: "你是智性的极简主义者，崇尚'Less is More'的知识分子美学。你冷静、理性，对庸俗的炫耀嗤之以鼻。你追求独特的设计感与思想深度，喜欢在小众领域深耕，外表冷淡疏离，内心却有着极其丰富且挑剔的精神世界。"
-            },
-            balenciaga: {
-                name: "Balenciaga",
-                desc: "你是先锋的叛逆者，站在潮流的最前端解构传统。你无视规则，甚至以'丑'为美，挑战大众的审美底线。你冷酷、前卫，带着一种生人勿近的气场，在这个同质化的世界里，你用尖锐的态度宣告自己的与众不同。"
-            },
-            armani: {
-                name: "Armani",
-                desc: "你是权力的掌控者，深谙职场与社会的运行规则。你追求极致的剪裁与舒适的质感，不张扬却极具存在感。你成熟、稳重、自律，懂得在适当的时候保持沉默，用无声的气场征服一切，是真正的大佬风范。"
+        // ========== Supabase Configuration ==========
+        const SUPABASE_URL = 'https://emigmxljsbqnphykzavm.supabase.co/rest/v1/';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtaWdteGxqc2JxbnBoeWt6YXZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MzUzMjksImV4cCI6MjA5NzMxMTMyOX0.lUbvmyGI68bjoa__PXZowp0lE7G8AaCPijEo7n7QPxQ';
+        let supabaseClient = null;
+        try {
+            if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_ANON_KEY') {
+                supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             }
+        } catch (e) { console.warn('Supabase init failed:', e); }
+
+        const brands = {
+            hermes: { name: "Hermès", desc: "你是时光的守望者，信奉'慢即是快'的极致哲学。在喧嚣世界中，你追求低调的奢华与永恒的工艺，拒绝被潮流裹挟。你拥有老钱风的从容与底气，注重内在品质而非外在Logo，生活对你而言是一场关于精致与耐心的长期主义修行。" },
+            chanel: { name: "Chanel", desc: "你是独立精神的化身，优雅中带着不可侵犯的傲骨。你崇尚自由与简约，坚信'时尚易逝，风格永存'。你既有女性的柔美，又有打破常规的叛逆，在职场与社交场上游刃有余，永远保持着头部高昂的姿态，做自己的女王。" },
+            lv: { name: "Louis Vuitton", desc: "你是旅行的艺术家，灵魂深处渴望着探索与冒险。你拥抱变化，热爱艺术与现代文化的碰撞，既尊重经典又敢于创新。你自信、外向，享受成为焦点的感觉，你的生活就是一场华丽的环球之旅，处处彰显着蓬勃的生命力。" },
+            gucci: { name: "Gucci", desc: "你是浪漫的复古主义者，内心住着一个华丽而 eclectic 的灵魂。你敢于打破性别与风格的界限，用大胆的色彩和繁复的元素表达自我。你敏感、富有创造力，追求极致的感官享受，在世俗眼中或许古怪，但在你眼里这是最高级的性感。" },
+            dior: { name: "Dior", desc: "你是梦幻的浪漫主义者，心中永远保留着一份纯真与优雅。你注重仪式感，生活对你来说需要精心雕琢。你温柔而坚定，追求完美与和谐，像一场精致的法式梦境，举手投足间散发着令人向往的贵族气息与女性魅力。" },
+            prada: { name: "Prada", desc: "你是智性的极简主义者，崇尚'Less is More'的知识分子美学。你冷静、理性，对庸俗的炫耀嗤之以鼻。你追求独特的设计感与思想深度，喜欢在小众领域深耕，外表冷淡疏离，内心却有着极其丰富且挑剔的精神世界。" },
+            balenciaga: { name: "Balenciaga", desc: "你是先锋的叛逆者，站在潮流的最前端解构传统。你无视规则，甚至以'丑'为美，挑战大众的审美底线。你冷酷、前卫，带着一种生人勿近的气场，在这个同质化的世界里，你用尖锐的态度宣告自己的与众不同。" },
+            armani: { name: "Armani", desc: "你是权力的掌控者，深谙职场与社会的运行规则。你追求极致的剪裁与舒适的质感，不张扬却极具存在感。你成熟、稳重、自律，懂得在适当的时候保持沉默，用无声的气场征服一切，是真正的大佬风范。" }
         };
 
         const questions = [
@@ -611,27 +274,11 @@
 
         let userAnswers = {};
         let brandScores = {};
-        let dimensionScores = {}; // 新增：维度得分记录
-
-        // 题目维度映射 (6个维度)
-        const questionDimensions = {
-            1: 'approach', 2: 'interest', 3: 'interest', 4: 'interest',
-            5: 'social', 6: 'social', 7: 'work', 8: 'approach',
-            9: 'approach', 10: 'social', 11: 'style', 12: 'style',
-            13: 'interest', 14: 'approach', 15: 'style', 16: 'work',
-            17: 'interest', 18: 'approach', 19: 'work', 20: 'approach',
-            21: 'approach', 22: 'social', 23: 'work', 24: 'social'
-        };
+        let userProfile = {};
+        let isGenerating = false;
 
         function initScores() {
-            brandScores = { hermes: 0, chanel: 0, lv: 0, gucci: 0, dior: 0, prada: 0, balenciaga: 0, armani: 0 };
-            dimensionScores = {
-                approach: { hermes: 0, chanel: 0, lv: 0, gucci: 0, dior: 0, prada: 0, balenciaga: 0, armani: 0 },
-                interest: { hermes: 0, chanel: 0, lv: 0, gucci: 0, dior: 0, prada: 0, balenciaga: 0, armani: 0 },
-                social: { hermes: 0, chanel: 0, lv: 0, gucci: 0, dior: 0, prada: 0, balenciaga: 0, armani: 0 },
-                work: { hermes: 0, chanel: 0, lv: 0, gucci: 0, dior: 0, prada: 0, balenciaga: 0, armani: 0 },
-                style: { hermes: 0, chanel: 0, lv: 0, gucci: 0, dior: 0, prada: 0, balenciaga: 0, armani: 0 }
-            };
+            brandScores = { hermes:0, chanel:0, lv:0, gucci:0, dior:0, prada:0, balenciaga:0, armani:0 };
         }
 
         const stageInfo = document.getElementById('stage-info');
@@ -646,227 +293,194 @@
         const alertModal = document.getElementById('alertModal');
         const modalMessage = document.getElementById('modalMessage');
         const progressFill = document.getElementById('progressFill');
+        const validationMsg = document.getElementById('validation-msg');
 
-        // Form Validation for Stage 1
         function checkFormValidity() {
-            if (nicknameInput.value.trim() && genderSelect.value && ageInput.value) {
-                startBtn.disabled = false;
-            } else {
-                startBtn.disabled = true;
-            }
+            const nick = nicknameInput.value.trim();
+            const gender = genderSelect.value;
+            const age = ageInput.value;
+            let missing = [];
+            if (!nick) missing.push("昵称");
+            if (!gender) missing.push("性别");
+            if (!age) missing.push("年龄");
+            if (missing.length === 0) { startBtn.disabled = false; validationMsg.textContent = ""; }
+            else { startBtn.disabled = true; validationMsg.textContent = "请完善以下信息：" + missing.join("、"); }
         }
-
         nicknameInput.addEventListener('input', checkFormValidity);
         genderSelect.addEventListener('change', checkFormValidity);
         ageInput.addEventListener('input', checkFormValidity);
 
-        // Start Test
         startBtn.addEventListener('click', () => {
-            userProfile = {
-                nickname: nicknameInput.value.trim(),
-                gender: genderSelect.value,
-                age: ageInput.value
-            };
+            const nick = nicknameInput.value.trim().substring(0, 20);
+            userProfile = { nickname: nick, gender: genderSelect.value, age: ageInput.value };
             initScores();
             renderQuestions();
             switchStage(stageInfo, stageQuiz);
         });
 
-        // Render Questions
         function renderQuestions() {
             questionsContainer.innerHTML = '';
             questions.forEach((q, index) => {
                 const card = document.createElement('div');
                 card.className = 'question-card';
-                card.innerHTML = `
-                    <div class="question-text">${index + 1}. ${q.text}</div>
-                    <div class="options-grid">
-                        ${q.options.map((opt, optIndex) => `
-                            <label class="option-label">
-                                <input type="radio" name="q${q.id}" value="${optIndex}" data-question-id="${q.id}">
-                                <span>${opt.text}</span>
-                            </label>
-                        `).join('')}
-                    </div>
-                `;
+                card.innerHTML = '<div class="question-text">' + (index+1) + '. ' + q.text + '</div><div class="options-grid">' +
+                    q.options.map((opt, oi) => '<label class="option-label"><input type="radio" name="q'+q.id+'" value="'+oi+'" data-question-id="'+q.id+'"><span>'+opt.text+'</span></label>').join('') + '</div>';
                 questionsContainer.appendChild(card);
             });
-
-            // Add event listeners to radio buttons
             document.querySelectorAll('input[type="radio"]').forEach(radio => {
                 radio.addEventListener('change', (e) => {
-                    const qId = parseInt(e.target.dataset.questionId);
-                    const optIndex = parseInt(e.target.value);
-                    userAnswers[qId] = optIndex;
+                    userAnswers[parseInt(e.target.dataset.questionId)] = parseInt(e.target.value);
                     updateProgress();
                 });
             });
         }
 
         function updateProgress() {
-            const answeredCount = Object.keys(userAnswers).length;
-            const progress = (answeredCount / questions.length) * 100;
-            progressFill.style.width = `${progress}%`;
+            progressFill.style.width = (Object.keys(userAnswers).length / questions.length * 100) + '%';
         }
 
-        // Generate Result
-        generateResultBtn.addEventListener('click', () => {
-            if (Object.keys(userAnswers).length < questions.length) {
-                showModal("您还有未做完的题目");
-                return;
+        generateResultBtn.addEventListener('click', async () => {
+            if (isGenerating) return;
+            if (Object.keys(userAnswers).length < questions.length) { showModal("您还有未做完的题目"); return; }
+            isGenerating = true;
+            generateResultBtn.disabled = true;
+            generateResultBtn.textContent = 'Generating...';
+            try {
+                calculateResults();
+                displayResults();
+                switchStage(stageQuiz, stageResult);
+                await saveToCloud();
+                await loadHistoryFromCloud();
+            } finally {
+                isGenerating = false;
+                generateResultBtn.disabled = false;
+                generateResultBtn.textContent = 'Generate Result / 生成结果';
             }
-            calculateResults();
-            saveToLocalStorage();
-            displayResults();
-            switchStage(stageQuiz, stageResult);
-            loadSocialHall();
         });
 
         function calculateResults() {
             initScores();
-            
-            // 1. 原始分数累加与维度记录
             questions.forEach(q => {
-                const selectedOptIndex = userAnswers[q.id];
-                const selectedOption = q.options[selectedOptIndex];
-                const dim = questionDimensions[q.id];
-
-                if (selectedOption && selectedOption.scores) {
-                    for (const [brand, score] of Object.entries(selectedOption.scores)) {
-                        if (brandScores[brand] !== undefined) {
-                            brandScores[brand] += score;
-                            if (dim && dimensionScores[dim][brand] !== undefined) {
-                                dimensionScores[dim][brand] += score;
-                            }
-                        }
+                const opt = q.options[userAnswers[q.id]];
+                if (opt && opt.scores) {
+                    for (const [brand, score] of Object.entries(opt.scores)) {
+                        if (brandScores[brand] !== undefined) brandScores[brand] += score;
                     }
                 }
             });
-
-            // 2. Z-Score 标准化处理 (消除量纲影响，使比较更公平)
             const scores = Object.values(brandScores);
-            const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
-            const variance = scores.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / scores.length;
+            const mean = scores.reduce((a,b) => a+b, 0) / scores.length;
+            const variance = scores.reduce((a,b) => a + Math.pow(b-mean,2), 0) / scores.length;
             const stdDev = Math.sqrt(variance);
-
-            // 如果标准差为0（所有品牌得分一样），则不进行标准化
             if (stdDev > 0) {
                 for (const brand in brandScores) {
-                    // 转换为标准分，并映射到 0-100 区间以便展示
-                    brandScores[brand] = ((brandScores[brand] - mean) / stdDev) * 15 + 50; 
+                    brandScores[brand] = ((brandScores[brand] - mean) / stdDev) * 15 + 50;
                 }
             }
         }
 
         function getSortedBrands() {
-            return Object.entries(brandScores)
-                .sort(([, a], [, b]) => b - a)
-                .map(([key, score]) => ({ key, name: brands[key].name, score }));
+            return Object.entries(brandScores).sort(([,a],[,b]) => b-a).map(([key,score]) => ({key, name: brands[key].name, score}));
         }
 
         function displayResults() {
             const sorted = getSortedBrands();
-            const topBrandKey = sorted[0].key;
-            
-            document.getElementById('topBrandName').textContent = brands[topBrandKey].name;
-            document.getElementById('topBrandDesc').textContent = brands[topBrandKey].desc;
-
+            document.getElementById('topBrandName').textContent = brands[sorted[0].key].name;
+            document.getElementById('topBrandDesc').textContent = brands[sorted[0].key].desc;
             const rankingList = document.getElementById('rankingList');
             rankingList.innerHTML = '';
-            
-            // 优化后的百分比计算：基于标准化后的分数分布
-            const maxScore = sorted[0].score;
-            const minScore = sorted[sorted.length - 1].score;
-            const range = maxScore - minScore || 1;
-
-            sorted.slice(0, 3).forEach((item, index) => {
-                // 将分数映射到 0-100% 区间，更直观地展示匹配度差异
-                const percentage = Math.round(((item.score - minScore) / range) * 100);
+            const maxS = sorted[0].score, minS = sorted[sorted.length-1].score, range = maxS - minS || 1;
+            sorted.slice(0,3).forEach((item, i) => {
+                const pct = Math.round(((item.score - minS) / range) * 100);
                 const li = document.createElement('li');
                 li.className = 'ranking-item';
-                li.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                        <span>${index + 1}. ${item.name}</span>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div style="width: 100px; height: 4px; background: #333; border-radius: 2px;">
-                                <div style="width: ${percentage}%; height: 100%; background: var(--accent-gold); border-radius: 2px;"></div>
-                            </div>
-                            <span style="font-size: 0.9rem; color: var(--text-secondary);">${percentage}%</span>
-                        </div>
-                    </div>
-                `;
+                li.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;width:100%;"><span>'+(i+1)+'. '+item.name+'</span><div style="display:flex;align-items:center;gap:10px;"><div style="width:100px;height:4px;background:#333;border-radius:2px;"><div style="width:'+pct+'%;height:100%;background:var(--accent-gold);border-radius:2px;"></div></div><span style="font-size:0.9rem;color:var(--text-secondary);">'+pct+'%</span></div></div>';
                 rankingList.appendChild(li);
             });
         }
 
-        // LocalStorage Logic
-        function saveToLocalStorage() {
+        // ========== Cloud Storage Logic ==========
+        async function saveToCloud() {
             const sorted = getSortedBrands();
-            const topBrandName = sorted[0].name;
-            
-            let users = JSON.parse(localStorage.getItem('luxuryBrandPersonaUsers') || '[]');
-            
-            // Check if user already exists (by nickname) and update, or add new
-            const existingIndex = users.findIndex(u => u.nickname === userProfile.nickname);
-            const userData = {
-                nickname: userProfile.nickname,
-                brand: topBrandName,
-                timestamp: new Date().toISOString()
-            };
-            
-            if (existingIndex > -1) {
-                users[existingIndex] = userData;
-            } else {
-                users.push(userData);
+            const topBrand = sorted[0].name;
+            const top3 = sorted.slice(0,3).map(s => s.name);
+            const record = { nickname: userProfile.nickname, top_brand: topBrand, top3_brands: top3 };
+
+            if (supabaseClient) {
+                try {
+                    const { error } = await supabaseClient.from('test_records').insert([record]);
+                    if (error) throw error;
+                    console.log('Saved to Supabase successfully');
+                    return;
+                } catch (e) {
+                    console.warn('Supabase save failed, falling back to localStorage:', e);
+                }
             }
-            
-            localStorage.setItem('luxuryBrandPersonaUsers', JSON.stringify(users));
+            // Fallback to localStorage
+            try {
+                let users = JSON.parse(localStorage.getItem('luxuryBrandPersonaUsers') || '[]');
+                if (!Array.isArray(users)) users = [];
+                users.push({ nickname: record.nickname, brand: record.top_brand, top3: record.top3_brands, timestamp: new Date().toISOString() });
+                localStorage.setItem('luxuryBrandPersonaUsers', JSON.stringify(users));
+            } catch (e) {
+                console.warn('localStorage save failed:', e);
+            }
         }
 
-        function loadSocialHall() {
-            const users = JSON.parse(localStorage.getItem('luxuryBrandPersonaUsers') || '[]');
+        async function loadHistoryFromCloud() {
             const userList = document.getElementById('userList');
+            userList.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:20px;">Loading...</p>';
+            let records = [];
+
+            if (supabaseClient) {
+                try {
+                    const { data, error } = await supabaseClient.from('test_records').select('*').order('created_at', { ascending: false }).limit(20);
+                    if (error) throw error;
+                    records = (data || []).map(r => ({ nickname: r.nickname, brand: r.top_brand, top3: r.top3_brands }));
+                } catch (e) {
+                    console.warn('Supabase load failed, falling back to localStorage:', e);
+                }
+            }
+
+            if (records.length === 0) {
+                try {
+                    const local = JSON.parse(localStorage.getItem('luxuryBrandPersonaUsers') || '[]');
+                    if (Array.isArray(local)) {
+                        records = local.slice(-20).reverse().map(u => ({ nickname: u.nickname, brand: u.brand, top3: u.top3 || [u.brand] }));
+                    }
+                } catch (e) {
+                    console.warn('localStorage load failed:', e);
+                }
+            }
+
             userList.innerHTML = '';
-            
-            // Show last 12 users, reversed (newest first)
-            users.slice(-12).reverse().forEach(user => {
+            if (records.length === 0) {
+                userList.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:20px;">Be the first to complete the test!</p>';
+                return;
+            }
+            records.forEach(r => {
                 const card = document.createElement('div');
                 card.className = 'user-card';
-                card.innerHTML = `
-                    <div class="name">${user.nickname}</div>
-                    <div class="brand">${user.brand}</div>
-                `;
+                const safeNick = escapeHtml(r.nickname);
+                const safeBrand = escapeHtml(r.brand);
+                const top3Html = (r.top3 || []).map(b => '<span>' + escapeHtml(b) + '</span>').join('');
+                card.innerHTML = '<div class="name">' + safeNick + '</div><div class="brand">' + safeBrand + '</div><div class="top3-brands">Top 3: ' + top3Html + '</div>';
                 userList.appendChild(card);
             });
         }
 
-        // Utility Functions
+        // ========== Utility Functions ==========
+        function escapeHtml(str) {
+            if (typeof str !== 'string') return '';
+            return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+        }
         function switchStage(from, to) {
             from.classList.remove('active');
-            setTimeout(() => {
-                from.style.display = 'none';
-                to.style.display = 'block';
-                setTimeout(() => {
-                    to.classList.add('active');
-                }, 50);
-            }, 400);
+            setTimeout(() => { from.style.display = 'none'; to.style.display = 'block'; setTimeout(() => { to.classList.add('active'); }, 50); }, 400);
         }
-
-        function showModal(message) {
-            modalMessage.textContent = message;
-            alertModal.classList.add('show');
-        }
-
-        function closeModal() {
-            alertModal.classList.remove('show');
-        }
-
-        // Close modal on outside click
-        alertModal.addEventListener('click', (e) => {
-            if (e.target === alertModal) {
-                closeModal();
-            }
-        });
+        function showModal(msg) { modalMessage.textContent = msg; alertModal.classList.add('show'); }
+        function closeModal() { alertModal.classList.remove('show'); }
+        alertModal.addEventListener('click', (e) => { if (e.target === alertModal) closeModal(); });
     </script>
 </body>
 </html>
